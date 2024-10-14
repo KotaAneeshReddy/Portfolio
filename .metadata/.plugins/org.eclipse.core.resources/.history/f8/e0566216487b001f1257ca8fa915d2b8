@@ -1,0 +1,5 @@
+package com.aneeshreddykota.repository;
+
+public class UserRepository {
+
+}

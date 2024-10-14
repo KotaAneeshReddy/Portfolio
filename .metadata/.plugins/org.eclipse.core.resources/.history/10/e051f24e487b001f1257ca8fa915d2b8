@@ -1,0 +1,7 @@
+package com.aneeshreddykota.service;
+
+@Bean
+public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();  // Using BCrypt hashing for passwords
+}
+

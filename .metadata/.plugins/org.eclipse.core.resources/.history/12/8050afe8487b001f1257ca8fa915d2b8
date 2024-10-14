@@ -1,0 +1,53 @@
+package com.aneeshreddykota.service;
+
+import java.util.Date;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Component;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+
+@Component
+public class JwtTokenProvider {
+
+    private final String JWT_SECRET = "yourSecretKey";  // Use a strong secret key
+    private final long JWT_EXPIRATION_MS = 86400000;    // Token validity duration (1 day in milliseconds)
+
+    // Generate token
+    public String generateToken(Authentication authentication) {
+        // You can customize the JWT claims here
+        String username = authentication.getName();
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + JWT_EXPIRATION_MS);
+
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(expiryDate)
+                .signWith(SignatureAlgorithm.HS512, JWT_SECRET)  // Signing the token with the secret key
+                .compact();
+    }
+
+    // Get username from the JWT token
+    public String getUsernameFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(JWT_SECRET)
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.getSubject();
+    }
+
+    // Validate the token
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parser().setSigningKey(JWT_SECRET).parseClaimsJws(token);
+            return true;
+        } catch (Exception ex) {
+            // Log token validation errors if necessary
+            return false;
+        }
+    }
+}

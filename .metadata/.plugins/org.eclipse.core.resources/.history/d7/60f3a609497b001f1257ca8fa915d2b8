@@ -1,0 +1,51 @@
+package com.aneeshreddykota.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import com.aneeshreddykota.service.CustomUserDetailsService;
+
+
+
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+    private final CustomUserDetailsService customUserDetailsService;
+
+    public SecurityConfig(CustomUserDetailsService customUserDetailsService) {
+        this.customUserDetailsService = customUserDetailsService;
+    }
+
+    // Password encoder to hash passwords
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();  // Use BCrypt for password encoding
+    }
+
+    // Configure authentication manager to use custom user details and password encoding
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
+    }
+
+    // Security filter chain to configure HTTP security
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf().disable() // Disable CSRF protection for simplicity (should enable in production)
+            .authorizeRequests()
+            .requestMatchers("/admin/**").authenticated()  // Require authentication for /admin/*
+            .anyRequest().permitAll()  // Allow other requests
+            .and()
+            .httpBasic();  // Use basic authentication (can be replaced with JWT)
+
+        return http.build();
+    }
+}

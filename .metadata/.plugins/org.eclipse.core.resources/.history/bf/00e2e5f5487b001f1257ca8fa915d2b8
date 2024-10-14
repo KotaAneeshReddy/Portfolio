@@ -1,0 +1,45 @@
+package com.aneeshreddykota.controller;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.aneeshreddykota.modal.LoginRequest;
+
+@RestController
+public class LoginController {
+	@PostMapping("/login")
+	public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
+	    try {
+	        // Authenticate the user with username and password
+	        Authentication authentication = authenticationManager.authenticate(
+	            new UsernamePasswordAuthenticationToken(
+	                loginRequest.getUsername(),  // Username provided by frontend
+	                loginRequest.getPassword()   // Password provided by frontend
+	            )
+	        );
+
+	        // If successful, store authentication in the security context
+	        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+	        // Generate a JWT token
+	        String jwt = jwtTokenProvider.generateToken(authentication);
+
+	        // Return the token to the frontend
+	        return ResponseEntity.ok(new JwtResponse(jwt));
+	        
+	    } catch (AuthenticationException e) {
+	        // Handle failed authentication (e.g., return a 401 Unauthorized response)
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+	    }
+	}
+
+
+
+}

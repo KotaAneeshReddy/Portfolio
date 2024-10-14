@@ -1,0 +1,5 @@
+package com.aneeshreddykota.service;
+
+public class JwtServiceProvider {
+
+}

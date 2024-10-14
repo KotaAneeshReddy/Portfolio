@@ -1,0 +1,5 @@
+package com.aneeshreddykota.dto;
+
+public class JwtResponse {
+
+}
